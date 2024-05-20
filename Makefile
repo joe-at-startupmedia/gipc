@@ -27,12 +27,20 @@ run_network: BUILD_FLAGS=$(shell echo '-tags network')
 .PHONY: run_network
 run_network: run
 
+test_network: BUILD_FLAGS=$(shell echo '-tags network')
+.PHONY: test_network
+test_network: test
+
+.PHONY: test_socket
+test_socket: test
+
 .PHONY: test
 test:
 	$(GO) clean -testcache
-	$(GO) test -race -v . ./test/
-	#parallel prevents multiple TCP servers on the same port
-	$(GO) test -race -v -tags network . ./test/ -parallel 1
+	$(ENV_VARS) $(GO) test $(BUILD_FLAGS) -race -v -parallel 1 -failfast $(TEST_FLAGS) .
+	$(ENV_VARS) $(GO) test $(BUILD_FLAGS) -race -v -run Base -parallel 1 -failfast $(TEST_FLAGS) ./test
+	$(ENV_VARS) $(GO) test $(BUILD_FLAGS) -race -v -run Reconnect -parallel 1 -failfast $(TEST_FLAGS) ./test
+	$(ENV_VARS) $(GO) test $(BUILD_FLAGS) -race -v -run Unix -parallel 1 -failfast $(TEST_FLAGS) ./test
 
 .PHONY: fmt
 fmt:

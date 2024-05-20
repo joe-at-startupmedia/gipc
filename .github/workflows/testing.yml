@@ -30,7 +30,7 @@ jobs:
       shell: bash
 
     - name: TestUbuntuCoverage
-      run: go test -race -v . ./test/ -parallel 1 -coverprofile=coverage.out -covermode=atomic
+      run: TEST_FLAGS="-coverprofile=coverage.out -covermode=atomic" make test_socket
       shell: bash
 
     - name: Upload coverage reports to Codecov
@@ -53,14 +53,14 @@ jobs:
         with:
           go-version: 1.21
 
-      - name: TestMac
+      - name: TestSocket
         if: |
           matrix.os == 'macOS-latest'
-        run: go test -race -v . ./test/ -parallel 1
+        run: ENV_VARS="GIPC_WAIT=1" make test_socket
         shell: bash
 
       - name: TestNetwork
-        run: go test -tags network -race -v . ./test/ -parallel 1
+        run: ENV_VARS="GIPC_WAIT=1" make test_network
         shell: bash
 
       - name: Build amd64

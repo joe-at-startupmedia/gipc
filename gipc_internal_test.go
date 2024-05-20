@@ -1,7 +1,6 @@
 package gipc
 
 import (
-	"fmt"
 	"testing"
 	"time"
 )
@@ -91,7 +90,7 @@ func TestRead(t *testing.T) {
 // client.connect is an internal method
 func TestServerReceiveWrongVersionNumber(t *testing.T) {
 
-	sc, err := StartServer(serverConfig("test5"))
+	sc, err := StartServer(serverConfig("test_wrongversion"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -99,7 +98,7 @@ func TestServerReceiveWrongVersionNumber(t *testing.T) {
 
 	go func() {
 
-		cc, err2 := NewClient("test5", nil)
+		cc, err2 := NewClient("test_wrongversion", nil)
 		if err2 != nil {
 			t.Error(err2)
 		}
@@ -129,7 +128,10 @@ func TestServerReceiveWrongVersionNumber(t *testing.T) {
 
 		m, err := sc.Read()
 		if err != nil {
-			fmt.Println(err)
+			if err.Error() != "client has a different VERSION number" {
+				t.Error("should have error because server sent the client the wrong VERSION number 1")
+			}
+
 			return
 		}
 
@@ -137,6 +139,8 @@ func TestServerReceiveWrongVersionNumber(t *testing.T) {
 			if m.Err.Error() != "client has a different VERSION number" {
 				t.Error("should have error because server sent the client the wrong VERSION number 1")
 			}
+
+			return
 		}
 	}
 }
@@ -144,7 +148,7 @@ func TestServerReceiveWrongVersionNumber(t *testing.T) {
 // client.connect is an internal method
 func TestServerReceiveWrongVersionNumberMulti(t *testing.T) {
 
-	config := serverConfig("test5")
+	config := serverConfig("test_wrongversion_multi")
 	config.MultiClient = true
 	sc, err := StartServer(config)
 	if err != nil {
@@ -154,7 +158,7 @@ func TestServerReceiveWrongVersionNumberMulti(t *testing.T) {
 
 	go func() {
 
-		cc, err2 := NewClient("test5", &ClientConfig{MultiClient: true})
+		cc, err2 := NewClient("test_wrongversion_multi", &ClientConfig{MultiClient: true})
 		if err2 != nil {
 			t.Error(err2)
 		}
@@ -183,8 +187,12 @@ func TestServerReceiveWrongVersionNumberMulti(t *testing.T) {
 	for {
 
 		m, err := sc.Read()
+
 		if err != nil {
-			fmt.Println(err)
+			if err.Error() != "client has a different VERSION number" {
+				t.Error("should have error because server sent the client the wrong VERSION number 1")
+			}
+
 			return
 		}
 
@@ -192,6 +200,8 @@ func TestServerReceiveWrongVersionNumberMulti(t *testing.T) {
 			if m.Err.Error() != "client has a different VERSION number" {
 				t.Error("should have error because server sent the client the wrong VERSION number 1")
 			}
+
+			return
 		}
 	}
 }

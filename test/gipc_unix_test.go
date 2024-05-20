@@ -9,8 +9,8 @@ import (
 	"testing"
 )
 
-func TestUnmask(t *testing.T) {
-	scon := serverConfig("test_unmask")
+func TestUnixUnmask(t *testing.T) {
+	scon := NewServerConfig("test_unmask")
 	scon.UnmaskPermissions = true
 	sc, err := gipc.StartServer(scon)
 	if err != nil {
@@ -33,16 +33,16 @@ func TestUnmask(t *testing.T) {
 }
 
 // fails in network mode to due to reconnecting causing a hang
-func TestServerClose(t *testing.T) {
+func TestUnixServerClose(t *testing.T) {
 
-	sc, err := gipc.StartServer(serverConfig("test1010"))
+	sc, err := gipc.StartServer(NewServerConfig("test1010"))
 	if err != nil {
 		t.Error(err)
 	}
 
 	gipc.Sleep()
 
-	cc, err2 := gipc.StartClient(clientConfig("test1010"))
+	cc, err2 := gipc.StartClient(NewClientConfig("test1010"))
 	if err2 != nil {
 		t.Error(err)
 	}

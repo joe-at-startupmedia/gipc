@@ -9,42 +9,23 @@ import (
 	"time"
 )
 
-var TimeoutClientConfig = gipc.ClientConfig{
-	Timeout:    time.Second * 3,
-	Encryption: gipc.ENCRYPT_BY_DEFAULT,
-}
+func TestBaseStartUp_Name(t *testing.T) {
 
-func clientTimeoutConfig(name string) *gipc.ClientConfig {
-	config := TimeoutClientConfig
-	config.Name = name
-	return &config
-}
-
-func serverConfig(name string) *gipc.ServerConfig {
-	return &gipc.ServerConfig{Name: name, Encryption: gipc.ENCRYPT_BY_DEFAULT}
-}
-
-func clientConfig(name string) *gipc.ClientConfig {
-	return &gipc.ClientConfig{Name: name, Encryption: gipc.ENCRYPT_BY_DEFAULT}
-}
-
-func TestStartUp_Name(t *testing.T) {
-
-	_, err := gipc.StartServer(serverConfig(""))
+	_, err := gipc.StartServer(NewServerConfig(""))
 	if err.Error() != "ipcName cannot be an empty string" {
 		t.Error("server - should have an error becuse the ipc name is empty")
 	}
 
-	_, err2 := gipc.StartClient(clientConfig(""))
+	_, err2 := gipc.StartClient(NewClientConfig(""))
 	if err2.Error() != "ipcName cannot be an empty string" {
 		t.Error("client - should have an error becuse the ipc name is empty")
 	}
 }
 
-func TestStartUp_Configs(t *testing.T) {
+func TestBaseStartUp_Configs(t *testing.T) {
 
-	scon := serverConfig("test_config")
-	ccon := clientConfig("test_config")
+	scon := NewServerConfig("test_config")
+	ccon := NewClientConfig("test_config")
 
 	sc, err3 := gipc.StartServer(scon)
 	if err3 != nil {
@@ -61,10 +42,10 @@ func TestStartUp_Configs(t *testing.T) {
 	defer cc.Close()
 }
 
-func TestStartUp_Configs2(t *testing.T) {
+func TestBaseStartUp_Configs2(t *testing.T) {
 
-	scon := serverConfig("test_config2")
-	ccon := clientConfig("test_config2")
+	scon := NewServerConfig("test_config2")
+	ccon := NewClientConfig("test_config2")
 
 	scon.MaxMsgSize = -1
 
@@ -87,10 +68,10 @@ func TestStartUp_Configs2(t *testing.T) {
 	defer cc.Close()
 }
 
-func TestStartUp_Configs3(t *testing.T) {
+func TestBaseStartUp_Configs3(t *testing.T) {
 
-	scon := serverConfig("test_config3")
-	ccon := clientConfig("test_config3")
+	scon := NewServerConfig("test_config3")
+	ccon := NewClientConfig("test_config3")
 
 	scon.MaxMsgSize = 1025
 
@@ -109,9 +90,9 @@ func TestStartUp_Configs3(t *testing.T) {
 	defer cc.Close()
 }
 
-func TestTimeoutNoServer(t *testing.T) {
+func TestBaseTimeoutNoServer(t *testing.T) {
 
-	ccon := clientTimeoutConfig("test_timeout")
+	ccon := NewClientTimeoutConfig("test_timeout")
 	cc, err := gipc.StartClient(ccon)
 	defer cc.Close()
 
@@ -120,7 +101,7 @@ func TestTimeoutNoServer(t *testing.T) {
 	}
 }
 
-func TestTimeoutNoServerRetry(t *testing.T) {
+func TestBaseTimeoutNoServerRetry(t *testing.T) {
 
 	dialFinished := make(chan bool, 1)
 
@@ -131,7 +112,7 @@ func TestTimeoutNoServerRetry(t *testing.T) {
 
 	go func() {
 		//this should retry every second and never return
-		cc, err := gipc.StartClient(clientTimeoutConfig("test_timeout_retryloop"))
+		cc, err := gipc.StartClient(NewClientTimeoutConfig("test_timeout_retryloop"))
 		defer cc.Close()
 		if err != nil && !strings.Contains(err.Error(), "timed out trying to connect") {
 			t.Error(err)
@@ -141,15 +122,15 @@ func TestTimeoutNoServerRetry(t *testing.T) {
 	<-dialFinished
 }
 
-func TestTimeoutServerDisconnected(t *testing.T) {
+func TestBaseTimeoutServerDisconnected(t *testing.T) {
 
-	scon := serverConfig("test_timeout_server_disconnect")
+	scon := NewServerConfig("test_timeout_server_disconnect")
 	sc, err := gipc.StartServer(scon)
 	if err != nil {
 		t.Error(err)
 	}
 
-	ccon := clientTimeoutConfig("test_timeout_server_disconnect")
+	ccon := NewClientTimeoutConfig("test_timeout_server_disconnect")
 
 	gipc.Sleep()
 
@@ -180,9 +161,9 @@ func TestTimeoutServerDisconnected(t *testing.T) {
 	}
 }
 
-func TestWrite(t *testing.T) {
+func TestBaseWrite(t *testing.T) {
 
-	sc, err := gipc.StartServer(serverConfig("test_write"))
+	sc, err := gipc.StartServer(NewServerConfig("test_write"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -190,7 +171,7 @@ func TestWrite(t *testing.T) {
 
 	gipc.Sleep()
 
-	cc, err2 := gipc.StartClient(clientConfig("test_write"))
+	cc, err2 := gipc.StartClient(NewClientConfig("test_write"))
 	if err2 != nil {
 		t.Error(err)
 	}
@@ -263,9 +244,9 @@ func TestWrite(t *testing.T) {
 	}
 }
 
-func TestStatus(t *testing.T) {
+func TestBaseStatus(t *testing.T) {
 
-	sc, err := gipc.StartServer(serverConfig("test_status"))
+	sc, err := gipc.StartServer(NewServerConfig("test_status"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -320,9 +301,9 @@ func TestStatus(t *testing.T) {
 	}
 }
 
-func TestGetConnected(t *testing.T) {
+func TestBaseGetConnected(t *testing.T) {
 
-	sc, err := gipc.StartServer(serverConfig("test22"))
+	sc, err := gipc.StartServer(NewServerConfig("test22"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -330,7 +311,7 @@ func TestGetConnected(t *testing.T) {
 
 	gipc.Sleep()
 
-	cc, err2 := gipc.StartClient(clientConfig("test22"))
+	cc, err2 := gipc.StartClient(NewClientConfig("test22"))
 	if err2 != nil {
 		t.Error(err)
 	}
@@ -346,9 +327,9 @@ func TestGetConnected(t *testing.T) {
 	}
 }
 
-func TestServerWrongMessageType(t *testing.T) {
+func TestBaseServerWrongMessageType(t *testing.T) {
 
-	sc, err := gipc.StartServer(serverConfig("test333"))
+	sc, err := gipc.StartServer(NewServerConfig("test333"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -356,7 +337,7 @@ func TestServerWrongMessageType(t *testing.T) {
 
 	gipc.Sleep()
 
-	cc, err2 := gipc.StartClient(clientConfig("test333"))
+	cc, err2 := gipc.StartClient(NewClientConfig("test333"))
 	if err2 != nil {
 		t.Error(err)
 	}
@@ -411,9 +392,9 @@ func TestServerWrongMessageType(t *testing.T) {
 
 	<-complete
 }
-func TestClientWrongMessageType(t *testing.T) {
+func TestBaseClientWrongMessageType(t *testing.T) {
 
-	sc, err := gipc.StartServer(serverConfig("test3"))
+	sc, err := gipc.StartServer(NewServerConfig("test3"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -421,7 +402,7 @@ func TestClientWrongMessageType(t *testing.T) {
 
 	gipc.Sleep()
 
-	cc, err2 := gipc.StartClient(clientConfig("test3"))
+	cc, err2 := gipc.StartClient(NewClientConfig("test3"))
 	if err2 != nil {
 		t.Error(err)
 	}
@@ -483,9 +464,9 @@ func TestClientWrongMessageType(t *testing.T) {
 
 	<-complete
 }
-func TestServerCorrectMessageType(t *testing.T) {
+func TestBaseServerCorrectMessageType(t *testing.T) {
 
-	sc, err := gipc.StartServer(serverConfig("test358"))
+	sc, err := gipc.StartServer(NewServerConfig("test358"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -493,7 +474,7 @@ func TestServerCorrectMessageType(t *testing.T) {
 
 	gipc.Sleep()
 
-	cc, err2 := gipc.StartClient(clientConfig("test358"))
+	cc, err2 := gipc.StartClient(NewClientConfig("test358"))
 	if err2 != nil {
 		t.Error(err)
 	}
@@ -551,9 +532,9 @@ func TestServerCorrectMessageType(t *testing.T) {
 	<-complete
 }
 
-func TestClientCorrectMessageType(t *testing.T) {
+func TestBaseClientCorrectMessageType(t *testing.T) {
 
-	sc, err := gipc.StartServer(serverConfig("test355"))
+	sc, err := gipc.StartServer(NewServerConfig("test355"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -561,7 +542,7 @@ func TestClientCorrectMessageType(t *testing.T) {
 
 	gipc.Sleep()
 
-	cc, err2 := gipc.StartClient(clientConfig("test355"))
+	cc, err2 := gipc.StartClient(NewClientConfig("test355"))
 	if err2 != nil {
 		t.Error(err)
 	}
@@ -622,9 +603,10 @@ func TestClientCorrectMessageType(t *testing.T) {
 	cc.Write(5, []byte(""))
 	<-complete
 }
-func TestServerSendMessage(t *testing.T) {
 
-	sc, err := gipc.StartServer(serverConfig("test377"))
+func TestBaseServerSendMessage(t *testing.T) {
+
+	sc, err := gipc.StartServer(NewServerConfig("test377"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -632,7 +614,7 @@ func TestServerSendMessage(t *testing.T) {
 
 	gipc.Sleep()
 
-	cc, err2 := gipc.StartClient(clientConfig("test377"))
+	cc, err2 := gipc.StartClient(NewClientConfig("test377"))
 	if err2 != nil {
 		t.Error(err)
 	}
@@ -703,9 +685,9 @@ func TestServerSendMessage(t *testing.T) {
 
 	<-complete
 }
-func TestClientSendMessage(t *testing.T) {
+func TestBaseClientSendMessage(t *testing.T) {
 
-	sc, err := gipc.StartServer(serverConfig("test3661"))
+	sc, err := gipc.StartServer(NewServerConfig("test3661"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -713,7 +695,7 @@ func TestClientSendMessage(t *testing.T) {
 
 	gipc.Sleep()
 
-	cc, err2 := gipc.StartClient(clientConfig("test3661"))
+	cc, err2 := gipc.StartClient(NewClientConfig("test3661"))
 	if err2 != nil {
 		t.Error(err)
 	}
@@ -784,9 +766,9 @@ func TestClientSendMessage(t *testing.T) {
 	<-complete
 }
 
-func TestClientClose(t *testing.T) {
+func TestBaseClientClose(t *testing.T) {
 
-	sc, err := gipc.StartServer(serverConfig("test10A"))
+	sc, err := gipc.StartServer(NewServerConfig("test10A"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -794,7 +776,7 @@ func TestClientClose(t *testing.T) {
 
 	gipc.Sleep()
 
-	cc, err2 := gipc.StartClient(clientConfig("test10A"))
+	cc, err2 := gipc.StartClient(NewClientConfig("test10A"))
 	if err2 != nil {
 		t.Error(err)
 	}
@@ -835,16 +817,16 @@ func TestClientClose(t *testing.T) {
 	<-holdIt
 }
 
-func TestClientReadClose(t *testing.T) {
+func TestBaseClientReadClose(t *testing.T) {
 
-	sc, err := gipc.StartServer(serverConfig("test_clientReadClose"))
+	sc, err := gipc.StartServer(NewServerConfig("test_clientReadClose"))
 	if err != nil {
 		t.Error(err)
 	}
 
 	gipc.Sleep()
 
-	cc, err2 := gipc.StartClient(clientTimeoutConfig("test_clientReadClose"))
+	cc, err2 := gipc.StartClient(NewClientTimeoutConfig("test_clientReadClose"))
 	if err2 != nil {
 		t.Error(err2)
 	}
@@ -905,9 +887,9 @@ func TestClientReadClose(t *testing.T) {
 	<-clientError
 }
 
-func TestServerWrongEncryption(t *testing.T) {
+func TestBaseServerWrongEncryption(t *testing.T) {
 
-	scon := serverConfig("testl337_enc")
+	scon := NewServerConfig("testl337_enc")
 	scon.Encryption = false
 	sc, err := gipc.StartServer(scon)
 	if err != nil {
@@ -916,7 +898,7 @@ func TestServerWrongEncryption(t *testing.T) {
 	defer sc.Close()
 
 	gipc.Sleep()
-	ccon := clientConfig("testl337_enc")
+	ccon := NewClientConfig("testl337_enc")
 	ccon.Encryption = true
 	cc, err2 := gipc.StartClient(ccon)
 	defer cc.Close()
@@ -954,9 +936,9 @@ func TestServerWrongEncryption(t *testing.T) {
 	}
 }
 
-func TestServerWrongEncryption2(t *testing.T) {
+func TestBaseServerWrongEncryption2(t *testing.T) {
 
-	scon := serverConfig("testl338_enc")
+	scon := NewServerConfig("testl338_enc")
 	scon.Encryption = true
 	sc, err := gipc.StartServer(scon)
 	if err != nil {
@@ -965,7 +947,7 @@ func TestServerWrongEncryption2(t *testing.T) {
 	defer sc.Close()
 
 	gipc.Sleep()
-	ccon := clientConfig("testl338_enc")
+	ccon := NewClientConfig("testl338_enc")
 	ccon.Encryption = false
 	cc, err2 := gipc.StartClient(ccon)
 	defer cc.Close()
