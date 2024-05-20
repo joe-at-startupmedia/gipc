@@ -30,7 +30,7 @@ jobs:
       shell: bash
 
     - name: TestUbuntuCoverage
-      run:  go test --race -v -parallel 1 -failfast -coverprofile=coverage.out -covermode=atomic .
+      run:  go test --race -v -parallel 1 -failfast -coverprofile=coverage.out -covermode=atomic ./...
       shell: bash
 
     - name: Upload coverage reports to Codecov
@@ -60,7 +60,7 @@ jobs:
         shell: bash
 
       - name: TestNetwork
-        run: ENV_VARS="GIPC_WAIT=1" make test_network
+        run: ENV_VARS="GIPC_TIMEOUT=5 GIPC_WAIT=1" make test_network
         shell: bash
 
       - name: Build amd64

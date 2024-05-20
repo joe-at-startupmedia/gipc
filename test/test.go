@@ -2,11 +2,24 @@ package test
 
 import (
 	"github.com/joe-at-startupmedia/gipc"
+	"os"
+	"strconv"
 	"time"
 )
 
+func GetTimeout() time.Duration {
+	envVar := os.Getenv("GIPC_TIMEOUT")
+	if len(envVar) > 0 {
+		valInt, err := strconv.Atoi(envVar)
+		if err == nil {
+			return time.Duration(valInt)
+		}
+	}
+	return 3
+}
+
 var TimeoutClientConfig = gipc.ClientConfig{
-	Timeout:    time.Second * 3,
+	Timeout:    time.Second * GetTimeout(),
 	Encryption: gipc.ENCRYPT_BY_DEFAULT,
 }
 
