@@ -1,0 +1,93 @@
+name: Testing
+
+on:
+  push:
+    branches: [ "master", "develop" ]
+    paths-ignore:
+      - '**.md'
+      - '**.sh'
+      - '**.yml'
+      - '**.yaml'
+  pull_request:
+    branches: [ "master", "develop" ]
+  workflow_dispatch:
+
+jobs:
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.21
+
+    - name: Vet
+      run: go vet ./...
+      shell: bash
+
+    - name: TestUbuntuCoverage
+      run: go test -race -v . ./test/ -parallel 1 -coverprofile=coverage.out -covermode=atomic
+      shell: bash
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4.0.1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+  build:
+    name: Build
+    needs: test
+    strategy:
+     matrix:
+       os: [ ubuntu-latest, macOS-latest, windows-2022 ]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.21
+
+      - name: TestOthers
+        if: |
+          matrix.os != 'ubuntu-latest'
+        run: go test -race -v . ./test/ -parallel 1
+        shell: bash
+
+      - name: TestNetwork
+        run: go test -tags network -race -v . ./test/ -parallel 1
+        shell: bash
+
+      - name: Build amd64
+        run: |
+          GOARCH=amd64 go build -v ./...
+        shell: bash
+
+      - name: Build 386
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          GOARCH=386 go build -v ./...
+        shell: bash
+
+      - name: Build arm64
+        if: |
+          matrix.os == 'ubuntu-latest'
+        run: |
+          GOARCH=arm64 go build -v ./...
+        shell: bash
+
+      - name: Build arm
+        if: |
+          matrix.os == 'ubuntu-latest'
+        run: |
+          GOARCH=arm go build -v ./...
+        shell: bash
+
+      - name: Finish
+        run: |
+          echo ":rocket: Build complete!" >> $GITHUB_STEP_SUMMARY
