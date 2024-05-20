@@ -30,7 +30,7 @@ jobs:
       shell: bash
 
     - name: TestUbuntuCoverage
-      run: TEST_FLAGS="-coverprofile=coverage.out -covermode=atomic" make test_socket
+      run:  go test --race -v -parallel 1 -failfast -coverprofile=coverage.out -covermode=atomic .
       shell: bash
 
     - name: Upload coverage reports to Codecov

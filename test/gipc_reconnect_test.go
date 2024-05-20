@@ -20,7 +20,7 @@ func TestReconnectClient(t *testing.T) {
 
 	cc, err2 := gipc.StartClient(ccon)
 	if err2 != nil {
-		t.Error(err)
+		t.Error(err2)
 	}
 	defer cc.Close()
 	connected := make(chan bool, 1)
@@ -95,7 +95,7 @@ func TestReconnectClientTimeout(t *testing.T) {
 
 	cc, err2 := gipc.StartClient(NewClientTimeoutConfig("test7"))
 	if err2 != nil {
-		t.Error(err)
+		t.Error(err2)
 	}
 	defer cc.Close()
 
@@ -226,7 +226,7 @@ func TestServerReconnect2(t *testing.T) {
 
 	cc, err2 := gipc.StartClient(NewClientConfig("test337"))
 	if err2 != nil {
-		t.Error(err)
+		t.Error(err2)
 	}
 
 	hasConnected := make(chan bool, 1)
@@ -308,7 +308,7 @@ func TestReconnectServerMulti(t *testing.T) {
 	ccon.MultiClient = true
 	cc, err2 := gipc.StartClient(ccon)
 	if err2 != nil {
-		t.Error(err)
+		t.Error(err2)
 	}
 
 	connected := make(chan bool, 1)
@@ -391,7 +391,7 @@ func TestReconnectServer2Multi(t *testing.T) {
 	ccon.MultiClient = true
 	cc, err2 := gipc.StartClient(ccon)
 	if err2 != nil {
-		t.Error(err)
+		t.Error(err2)
 	}
 
 	hasConnected := make(chan bool, 1)
