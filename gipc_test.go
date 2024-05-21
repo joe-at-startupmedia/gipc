@@ -44,17 +44,19 @@ func TestBaseStartUp_Name(t *testing.T) {
 
 	Sleep()
 
-	_, err := StartServer(NewServerConfig(""))
+	sc, err := StartServer(NewServerConfig(""))
 	if err.Error() != "ipcName cannot be an empty string" {
 		t.Error("server - should have an error becuse the ipc name is empty")
 	}
+	defer sc.Close()
 
 	Sleep()
 
-	_, err2 := StartClient(NewClientConfig(""))
+	cc, err2 := StartClient(NewClientConfig(""))
 	if err2.Error() != "ipcName cannot be an empty string" {
 		t.Error("client - should have an error becuse the ipc name is empty")
 	}
+	defer cc.Close()
 }
 
 func TestBaseStartUp_Configs(t *testing.T) {
