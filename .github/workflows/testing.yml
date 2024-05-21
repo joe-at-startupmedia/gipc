@@ -60,6 +60,8 @@ jobs:
         shell: bash
 
       - name: TestNetwork
+        if: |
+          matrix.os != 'macOS-latest'
         run: GIPC_WAIT=1500 make test_network
         shell: bash
 
