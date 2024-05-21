@@ -27,5 +27,5 @@ jobs:
         run: go mod download -x
 
       - name: Run Simple
-        shell: pwsh
-        run: go run example/simple/simple.go
+        shell: bash
+        run: GIPC_TIMEOUT=5 GIPC_WAIT=2500 make test
