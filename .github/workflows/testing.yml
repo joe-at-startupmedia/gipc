@@ -56,12 +56,18 @@ jobs:
       - name: TestSocket
         if: |
           matrix.os == 'macOS-latest'
-        run: GIPC_WAIT=2500 make test_socket
+        run: GIPC_TIMEOUT=10 GIPC_WAIT=2500 make test_socket
         shell: bash
 
-      - name: TestNetwork
+      - name: TestNetworkWindows
         if: |
-          matrix.os != 'macOS-latest'
+          matrix.os == 'windows-2022'
+        run: GIPC_TIMEOUT=10 GIPC_WAIT=2500 make test_network
+        shell: bash
+
+      - name: TestNetworkUbuntu
+        if: |
+          matrix.os == 'ubuntu-latest'
         run: GIPC_WAIT=2500 make test_network
         shell: bash
 

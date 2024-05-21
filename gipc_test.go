@@ -3,13 +3,26 @@ package gipc
 import (
 	"fmt"
 	"log"
+	"os"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
 )
 
+func GetTimeout() time.Duration {
+	envVar := os.Getenv("GIPC_TIMEOUT")
+	if len(envVar) > 0 {
+		valInt, err := strconv.Atoi(envVar)
+		if err == nil {
+			return time.Duration(valInt)
+		}
+	}
+	return 3
+}
+
 var TimeoutClientConfig = ClientConfig{
-	Timeout:    time.Second * 3,
+	Timeout:    time.Second * GetTimeout(),
 	Encryption: ENCRYPT_BY_DEFAULT,
 }
 
