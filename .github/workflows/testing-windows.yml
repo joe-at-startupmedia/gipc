@@ -26,6 +26,6 @@ jobs:
       - name: Pre-fill Module Cache
         run: go mod download -x
 
-      - name: Test repo
+      - name: Run Simple
         shell: bash
-        run: GIPC_TIMEOUT=5 GIPC_WAIT=2500 make run
+        run: go run example/simple/simple.go
