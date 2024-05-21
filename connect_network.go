@@ -36,13 +36,21 @@ func GetDefaultNetworkType() string {
 	return DEFAULT_NETWORK_TYPE
 }
 
-func getHostAddr(clientId int) string {
-	return fmt.Sprintf("%s:%d", GetDefaultHost(), GetDefaultPort()+clientId)
+func (c *Client) getHostAddr(clientId int) string {
+
+	port := GetPort(c.config.ClientConfig.Name)
+	return fmt.Sprintf("%s:%d", GetDefaultHost(), port+clientId)
+}
+
+func (s *Server) getHostAddr(clientId int) string {
+
+	port := GetPort(s.config.ServerConfig.Name)
+	return fmt.Sprintf("%s:%d", GetDefaultHost(), port+clientId)
 }
 
 func (c *Client) connect() (net.Conn, error) {
 
-	conn, err := net.Dial(DEFAULT_NETWORK_TYPE, getHostAddr(c.ClientId))
+	conn, err := net.Dial(DEFAULT_NETWORK_TYPE, c.getHostAddr(c.ClientId))
 	if err != nil {
 		c.logger.Errorf("Dial error: %s", err)
 	}
@@ -52,7 +60,7 @@ func (c *Client) connect() (net.Conn, error) {
 
 func (s *Server) listen(clientId int) error {
 
-	listener, err := net.Listen(DEFAULT_NETWORK_TYPE, getHostAddr(clientId))
+	listener, err := net.Listen(DEFAULT_NETWORK_TYPE, s.getHostAddr(clientId))
 	if err != nil {
 		return err
 	}

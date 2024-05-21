@@ -35,11 +35,11 @@ func NewServer(name string, config *ServerConfig) (*Server, error) {
 			MaxMsgSize: MAX_MSG_SIZE,
 			Encryption: ENCRYPT_BY_DEFAULT,
 		}
-		s.Config.ServerConfig = serverConfig
+		s.config.ServerConfig = serverConfig
 	} else {
 
 		if config.MaxMsgSize < 1024 {
-			s.Config.ServerConfig.MaxMsgSize = MAX_MSG_SIZE
+			s.config.ServerConfig.MaxMsgSize = MAX_MSG_SIZE
 		}
 	}
 	return s, err
@@ -128,7 +128,7 @@ func (s *Server) close() {
 // Close - closes the connection
 func (s *Server) Close() {
 
-	if s.Config.ServerConfig.MultiClient {
+	if s.config.ServerConfig.MultiClient {
 		s.Connections.Close()
 	} else {
 		s.close()

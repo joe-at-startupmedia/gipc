@@ -70,7 +70,7 @@ func (sc *Server) one() error {
 func (sc *Server) msgLength() error {
 
 	buff := make([]byte, 4)
-	binary.BigEndian.PutUint32(buff, uint32(sc.Config.ServerConfig.MaxMsgSize))
+	binary.BigEndian.PutUint32(buff, uint32(sc.config.ServerConfig.MaxMsgSize))
 
 	var err error
 

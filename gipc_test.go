@@ -332,7 +332,7 @@ func TestBaseWrite(t *testing.T) {
 		t.Error("0 is not allowed as a message type")
 	}
 
-	buf = make([]byte, sc.Config.ServerConfig.MaxMsgSize+5)
+	buf = make([]byte, sc.config.ServerConfig.MaxMsgSize+5)
 	err4 := sc.Write(2, buf)
 
 	if err4.Error() != "message exceeds maximum message length" {

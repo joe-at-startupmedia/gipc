@@ -40,7 +40,7 @@ func NewActor(ac *ActorConfig) Actor {
 		received: make(chan *Message),
 		toWrite:  make(chan *Message),
 		logger:   logger,
-		Config:   ac,
+		config:   ac,
 		mutex:    &sync.Mutex{},
 	}
 }
@@ -59,7 +59,7 @@ func (a *Actor) Read() (*Message, error) {
 
 	if m.Err != nil {
 		a.logger.Errorf("%s.Read err: %s", a, m.Err)
-		if !a.Config.IsServer {
+		if !a.config.IsServer {
 			close(a.received)
 			close(a.toWrite)
 		}
@@ -120,12 +120,12 @@ func (a *Actor) Write(msgType int, message []byte) error {
 
 	status := a.getStatus()
 
-	if a.Config.IsServer && status == Listening {
+	if a.config.IsServer && status == Listening {
 		time.Sleep(time.Millisecond * 2)
 		a.logger.Infoln("Server is still listening so lets use recursion")
 		//it's possible the client hasn't connected yet so retry it
 		return a.Write(msgType, message)
-	} else if !a.Config.IsServer && status == Connecting {
+	} else if !a.config.IsServer && status == Connecting {
 		a.logger.Infoln("Client is still connecting so lets use recursion")
 		time.Sleep(time.Millisecond * 100)
 		return a.Write(msgType, message)
@@ -136,8 +136,8 @@ func (a *Actor) Write(msgType int, message []byte) error {
 	}
 
 	mlen := len(message)
-	if a.Config.IsServer {
-		if mlen > a.Config.ServerConfig.MaxMsgSize {
+	if a.config.IsServer {
+		if mlen > a.config.ServerConfig.MaxMsgSize {
 			err := errors.New("message exceeds maximum message length")
 			a.logger.Errorf("%s.Write err: %s", a, err)
 			return err
@@ -324,7 +324,7 @@ func (a *Actor) Close() {
 }
 
 func (a *Actor) String() string {
-	if a.Config.IsServer {
+	if a.config.IsServer {
 		return fmt.Sprintf("Server(%s)", a.getStatus())
 	} else {
 		return a.clientRef.String()

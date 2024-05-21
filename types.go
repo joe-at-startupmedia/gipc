@@ -15,7 +15,7 @@ type Actor struct {
 	received  chan (*Message)
 	toWrite   chan (*Message)
 	logger    *logrus.Logger
-	Config    *ActorConfig
+	config    *ActorConfig
 	cipher    *cipher.AEAD
 	clientRef *Client
 	mutex     *sync.Mutex

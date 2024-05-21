@@ -20,7 +20,7 @@ func getSocketName(clientId int, name string) string {
 
 func (c *Client) connect() (net.Conn, error) {
 
-	conn, err := net.Dial("unix", getSocketName(c.ClientId, c.Config.ClientConfig.Name))
+	conn, err := net.Dial("unix", getSocketName(c.ClientId, c.config.ClientConfig.Name))
 	//connect: no such file or directory happens a lot when the client connection closes under normal circumstances
 	if err != nil && !strings.Contains(err.Error(), "connect: no such file or directory") &&
 		!strings.Contains(err.Error(), "connect: connection refused") {
@@ -32,14 +32,14 @@ func (c *Client) connect() (net.Conn, error) {
 
 func (s *Server) listen(clientId int) error {
 
-	socketName := getSocketName(clientId, s.Config.ServerConfig.Name)
+	socketName := getSocketName(clientId, s.config.ServerConfig.Name)
 
 	if err := os.RemoveAll(socketName); err != nil {
 		return err
 	}
 
 	var oldUmask int
-	if s.Config.ServerConfig.UnmaskPermissions {
+	if s.config.ServerConfig.UnmaskPermissions {
 		oldUmask = syscall.Umask(0)
 	}
 
@@ -50,7 +50,7 @@ func (s *Server) listen(clientId int) error {
 
 	s.listener = listener
 
-	if s.Config.ServerConfig.UnmaskPermissions {
+	if s.config.ServerConfig.UnmaskPermissions {
 		syscall.Umask(oldUmask)
 	}
 

@@ -14,10 +14,10 @@ import (
 )
 
 func (a *Actor) shouldUseEncryption() bool {
-	if a.Config.IsServer {
-		return a.Config.ServerConfig.Encryption
+	if a.config.IsServer {
+		return a.config.ServerConfig.Encryption
 	} else {
-		return a.Config.ClientConfig.Encryption
+		return a.config.ClientConfig.Encryption
 	}
 }
 

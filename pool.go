@@ -70,7 +70,7 @@ func connectionListener(cms *Server, s *Server) {
 			}
 			cms.logger.Infof("received a request to create a new client server %d", clientCount)
 			//ns, err2 := NewServer(fmt.Sprintf("%s%d", s.config.ServerConfig.Name, clientCount), s.config.ServerConfig)
-			ns, err2 := NewServer(s.Config.ServerConfig.Name, s.Config.ServerConfig)
+			ns, err2 := NewServer(s.config.ServerConfig.Name, s.config.ServerConfig)
 			if err2 != nil {
 				cms.logger.Errorf("encountered an error attempting to create a client server %d %s", clientCount, err2)
 				continue

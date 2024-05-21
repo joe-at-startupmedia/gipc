@@ -27,7 +27,7 @@ run_network: BUILD_FLAGS=$(shell echo '-tags network')
 .PHONY: run_network
 run_network: run
 
-test_network: BUILD_FLAGS=$(shell echo '-tags network')
+test_network: BUILD_FLAGS=$(shell echo '-tags network,randomize_ports')
 .PHONY: test_network
 test_network: test
 
