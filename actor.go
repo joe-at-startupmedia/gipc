@@ -237,7 +237,7 @@ func (a *Actor) write() {
 
 func (a *Actor) _dispatchStatus(status Status, blocking bool) {
 	a.logger.Debugf("Actor.dispacthStatus(%s): %s", a, status)
-	a.SetStatus(status)
+	a.setStatus(status)
 	if blocking {
 		a.received <- &Message{Status: status.String(), MsgType: -1}
 	} else {
@@ -293,7 +293,7 @@ func (a *Actor) getStatus() Status {
 	return status
 }
 
-func (a *Actor) SetStatus(status Status) {
+func (a *Actor) setStatus(status Status) {
 	a.mutex.Lock()
 	a.status = status
 	a.mutex.Unlock()
@@ -310,17 +310,13 @@ func (a *Actor) Status() string {
 	return a.getStatus().String()
 }
 
-func (a *Actor) GetLogger() *logrus.Logger {
-	return a.logger
-}
-
 // Close - closes the connection
 func (a *Actor) Close() {
 
 	//omits errors resulting from connections being closed
 	a.logger.SetLevel(logrus.FatalLevel)
 
-	a.SetStatus(Closing)
+	a.setStatus(Closing)
 
 	if a.conn != nil {
 		a.getConn().Close()

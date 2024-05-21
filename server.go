@@ -54,7 +54,7 @@ func (s *Server) run(clientId int) (*Server, error) {
 	}
 
 	go s.acceptLoop()
-	s.SetStatus(Listening)
+	s.setStatus(Listening)
 
 	return s, nil
 }
@@ -78,7 +78,7 @@ func (s *Server) acceptLoop() {
 			if err2 != nil {
 				s.logger.Errorf("Server.acceptLoop handshake err: %s", err2)
 				s.dispatchError(err2)
-				s.SetStatus(Error)
+				s.setStatus(Error)
 				s.listener.Close()
 				conn.Close()
 

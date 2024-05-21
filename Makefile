@@ -37,10 +37,10 @@ test_socket: test
 .PHONY: test
 test:
 	$(GO) clean -testcache
-	$(ENV_VARS) $(GO) test $(BUILD_FLAGS) -race -v -parallel 1 -failfast $(TEST_FLAGS) .
-	$(ENV_VARS) $(GO) test $(BUILD_FLAGS) -race -v -run Base -parallel 1 -failfast $(TEST_FLAGS) ./test
-	$(ENV_VARS) $(GO) test $(BUILD_FLAGS) -race -v -run Reconnect -parallel 1 -failfast $(TEST_FLAGS) ./test
-	$(ENV_VARS) $(GO) test $(BUILD_FLAGS) -race -v -run Unix -parallel 1 -failfast $(TEST_FLAGS) ./test
+	$(GO) test $(BUILD_FLAGS) -race -v -parallel 1 -failfast $(TEST_FLAGS) -run Base .
+	$(GO) test $(BUILD_FLAGS) -race -v -parallel 1 -failfast $(TEST_FLAGS) -run Reconnect .
+	$(GO) test $(BUILD_FLAGS) -race -v -parallel 1 -failfast $(TEST_FLAGS) -run Unix .
+	$(GO) test $(BUILD_FLAGS) -race -v -parallel 1 -failfast $(TEST_FLAGS) -run Handshake .
 
 .PHONY: fmt
 fmt:

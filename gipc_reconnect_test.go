@@ -1,24 +1,25 @@
 package gipc
 
 import (
-	"github.com/joe-at-startupmedia/gipc"
 	"testing"
 	"time"
 )
 
 func TestReconnectClient(t *testing.T) {
 
+	Sleep()
+
 	scon := NewServerConfig("test127")
-	sc, err := gipc.StartServer(scon)
+	sc, err := StartServer(scon)
 	if err != nil {
 		t.Error(err)
 	}
 
-	gipc.Sleep()
+	Sleep()
 
 	ccon := NewClientConfig("test127")
 
-	cc, err2 := gipc.StartClient(ccon)
+	cc, err2 := StartClient(ccon)
 	if err2 != nil {
 		t.Error(err2)
 	}
@@ -43,7 +44,7 @@ func TestReconnectClient(t *testing.T) {
 
 		for {
 			m, _ := cc.Read()
-			if m == gipc.TimeoutMessage {
+			if m == TimeoutMessage {
 				continue
 			} else if m != nil {
 				if m.Status == "Connected" {
@@ -68,7 +69,7 @@ func TestReconnectClient(t *testing.T) {
 	sc.Close()
 
 	//start a new server
-	sc2, err := gipc.StartServer(scon)
+	sc2, err := StartServer(scon)
 	if err != nil {
 		t.Error(err)
 	}
@@ -86,14 +87,16 @@ func TestReconnectClient(t *testing.T) {
 
 func TestReconnectClientTimeout(t *testing.T) {
 
-	sc, err := gipc.StartServer(NewServerConfig("test7"))
+	Sleep()
+
+	sc, err := StartServer(NewServerConfig("test7"))
 	if err != nil {
 		t.Error(err)
 	}
 
-	gipc.Sleep()
+	Sleep()
 
-	cc, err2 := gipc.StartClient(NewClientTimeoutConfig("test7"))
+	cc, err2 := StartClient(NewClientTimeoutConfig("test7"))
 	if err2 != nil {
 		t.Error(err2)
 	}
@@ -138,16 +141,18 @@ func TestReconnectClientTimeout(t *testing.T) {
 
 func TestReconnectServer(t *testing.T) {
 
-	sc, err := gipc.StartServer(NewServerConfig("test1277"))
+	Sleep()
+
+	sc, err := StartServer(NewServerConfig("test1277"))
 	if err != nil {
 		t.Error(err)
 	}
 	defer sc.Close()
 
-	gipc.Sleep()
+	Sleep()
 
 	ccon := NewClientConfig("test1277")
-	cc, err2 := gipc.StartClient(ccon)
+	cc, err2 := StartClient(ccon)
 	if err2 != nil {
 		t.Error(err2)
 	}
@@ -205,7 +210,7 @@ func TestReconnectServer(t *testing.T) {
 	// working most of the time except when the rare race conditions are met
 	time.Sleep(time.Second * 1)
 
-	cc2, err := gipc.StartClient(NewClientTimeoutConfig("test1277"))
+	cc2, err := StartClient(NewClientTimeoutConfig("test1277"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -216,15 +221,17 @@ func TestReconnectServer(t *testing.T) {
 
 func TestServerReconnect2(t *testing.T) {
 
-	sc, err := gipc.StartServer(NewServerConfig("test337"))
+	Sleep()
+
+	sc, err := StartServer(NewServerConfig("test337"))
 	if err != nil {
 		t.Error(err)
 	}
 	defer sc.Close()
 
-	gipc.Sleep()
+	Sleep()
 
-	cc, err2 := gipc.StartClient(NewClientConfig("test337"))
+	cc, err2 := StartClient(NewClientConfig("test337"))
 	if err2 != nil {
 		t.Error(err2)
 	}
@@ -248,7 +255,7 @@ func TestServerReconnect2(t *testing.T) {
 
 					<-hasDisconnected
 
-					c2, err2 := gipc.StartClient(NewClientConfig("test337"))
+					c2, err2 := StartClient(NewClientConfig("test337"))
 					if err2 != nil {
 						t.Error(err)
 					}
@@ -294,19 +301,21 @@ func TestServerReconnect2(t *testing.T) {
 
 func TestReconnectServerMulti(t *testing.T) {
 
+	Sleep()
+
 	scon := NewServerConfig("test1277_multi")
 	scon.MultiClient = true
-	sc, err := gipc.StartServer(scon)
+	sc, err := StartServer(scon)
 	if err != nil {
 		t.Error(err)
 	}
 	defer sc.Close()
 
-	gipc.Sleep()
+	Sleep()
 
 	ccon := NewClientConfig("test1277_multi")
 	ccon.MultiClient = true
-	cc, err2 := gipc.StartClient(ccon)
+	cc, err2 := StartClient(ccon)
 	if err2 != nil {
 		t.Error(err2)
 	}
@@ -334,7 +343,7 @@ func TestReconnectServerMulti(t *testing.T) {
 
 		for {
 			//We used ReadTimed in order to scan client buffer on the next loop
-			sc.Connections.ReadTimed(2*time.Second, func(_ *gipc.Server, m *gipc.Message, err error) {
+			sc.Connections.ReadTimed(2*time.Second, func(_ *Server, m *Message, err error) {
 
 				if err != nil {
 					return
@@ -361,7 +370,7 @@ func TestReconnectServerMulti(t *testing.T) {
 	time.Sleep(1 * time.Second) //wait for connection to close before reconnecting
 	ccon = NewClientConfig("test1277_multi")
 	ccon.MultiClient = true
-	c2, err := gipc.StartClient(ccon)
+	c2, err := StartClient(ccon)
 	if err != nil {
 		t.Error(err)
 	}
@@ -378,18 +387,21 @@ func TestReconnectServerMulti(t *testing.T) {
 }
 
 func TestReconnectServer2Multi(t *testing.T) {
+
+	Sleep()
+
 	scon := NewServerConfig("test337_multi")
 	scon.MultiClient = true
-	sc, err := gipc.StartServer(scon)
+	sc, err := StartServer(scon)
 	if err != nil {
 		t.Error(err)
 	}
 	defer sc.Close()
 
-	gipc.Sleep()
+	Sleep()
 	ccon := NewClientConfig("test337_multi")
 	ccon.MultiClient = true
-	cc, err2 := gipc.StartClient(ccon)
+	cc, err2 := StartClient(ccon)
 	if err2 != nil {
 		t.Error(err2)
 	}
@@ -415,7 +427,7 @@ func TestReconnectServer2Multi(t *testing.T) {
 
 					ccon2 := NewClientConfig("test337_multi")
 					ccon2.MultiClient = true
-					c2, err2 := gipc.StartClient(ccon2)
+					c2, err2 := StartClient(ccon2)
 					if err2 != nil {
 						t.Error(err)
 					}
@@ -441,7 +453,7 @@ func TestReconnectServer2Multi(t *testing.T) {
 		case <-hasReconnected:
 			return
 		default:
-			sc.Connections.ReadTimed(2*time.Second, func(_ *gipc.Server, m *gipc.Message, err error) {
+			sc.Connections.ReadTimed(2*time.Second, func(_ *Server, m *Message, err error) {
 				if m.Status == "Connected" && connect == false {
 					hasConnected <- true
 					connect = true

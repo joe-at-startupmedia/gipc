@@ -4,21 +4,23 @@ package gipc
 
 import (
 	"fmt"
-	"github.com/joe-at-startupmedia/gipc"
 	"os"
 	"testing"
 )
 
 func TestUnixUnmask(t *testing.T) {
+
+	Sleep()
+
 	scon := NewServerConfig("test_unmask")
 	scon.UnmaskPermissions = true
-	sc, err := gipc.StartServer(scon)
+	sc, err := StartServer(scon)
 	if err != nil {
 		t.Error(err)
 	}
 	defer sc.Close()
 
-	gipc.Sleep()
+	Sleep()
 
 	info, err := os.Stat(sc.GetListener().Addr().String())
 	if err != nil {
@@ -35,14 +37,16 @@ func TestUnixUnmask(t *testing.T) {
 // fails in network mode to due to reconnecting causing a hang
 func TestUnixServerClose(t *testing.T) {
 
-	sc, err := gipc.StartServer(NewServerConfig("test1010"))
+	Sleep()
+
+	sc, err := StartServer(NewServerConfig("test1010"))
 	if err != nil {
 		t.Error(err)
 	}
 
-	gipc.Sleep()
+	Sleep()
 
-	cc, err2 := gipc.StartClient(NewClientConfig("test1010"))
+	cc, err2 := StartClient(NewClientConfig("test1010"))
 	if err2 != nil {
 		t.Error(err)
 	}

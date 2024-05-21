@@ -9,7 +9,9 @@ func serverConfig(name string) *ServerConfig {
 }
 
 // client.connect is an internal method
-func TestServerReceiveWrongVersionNumber(t *testing.T) {
+func TestHandshakeServerReceiveWrongVersionNumber(t *testing.T) {
+
+	Sleep()
 
 	sc, err := StartServer(serverConfig("test_wrongversion"))
 	if err != nil {
@@ -18,6 +20,8 @@ func TestServerReceiveWrongVersionNumber(t *testing.T) {
 	defer sc.Close()
 
 	go func() {
+
+		Sleep()
 
 		cc, err2 := NewClient("test_wrongversion", nil)
 		if err2 != nil {
@@ -67,7 +71,9 @@ func TestServerReceiveWrongVersionNumber(t *testing.T) {
 }
 
 // client.connect is an internal method
-func TestServerReceiveWrongVersionNumberMulti(t *testing.T) {
+func TestHandshakeServerReceiveWrongVersionNumberMulti(t *testing.T) {
+
+	Sleep()
 
 	config := serverConfig("test_wrongversion_multi")
 	config.MultiClient = true
@@ -78,6 +84,8 @@ func TestServerReceiveWrongVersionNumberMulti(t *testing.T) {
 	defer sc.Close()
 
 	go func() {
+
+		Sleep()
 
 		cc, err2 := NewClient("test_wrongversion_multi", &ClientConfig{MultiClient: true})
 		if err2 != nil {
