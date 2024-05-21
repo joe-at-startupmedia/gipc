@@ -42,7 +42,7 @@ jobs:
     needs: test
     strategy:
      matrix:
-       os: [ ubuntu-latest, windows-2022 ]
+       os: [ ubuntu-latest, windows-latest ]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -55,8 +55,8 @@ jobs:
 
       - name: TestNetworkWindows
         if: |
-          matrix.os == 'windows-2022'
-        run: GIPC_WAIT=2500 go test -race -v -parallel 1 -failfast -run "Base|Connect|Handshake" .
+          matrix.os == 'windows-latest'
+        run: GIPC_TIMEOUT=10 GIPC_WAIT=2500 go test -race -v -parallel 1 -failfast -run "Base|Connect|Handshake" .
         shell: bash
 
       - name: TestNetworkUbuntu
