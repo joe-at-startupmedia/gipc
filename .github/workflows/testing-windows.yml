@@ -1,5 +1,9 @@
 name: Testing Windows
 
+on:
+  push:
+    branches: [ "windows" ]
+
 jobs:
 
   test:
