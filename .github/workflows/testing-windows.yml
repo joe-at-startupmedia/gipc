@@ -27,5 +27,5 @@ jobs:
         run: go mod download -x
 
       - name: Test repo
-        shell: pwsh
-        run: go test -v ./...
+        shell: bash
+        run: GIPC_TIMEOUT=5 GIPC_WAIT=2500 make
