@@ -33,10 +33,6 @@ jobs:
       run:  go test --race -v -parallel 1 -coverprofile=coverage.out -covermode=atomic .
       shell: bash
 
-    - name: TestNetworkUbuntu
-      run: GIPC_TIMEOUT=5 GIPC_WAIT=2500 make test_network
-      shell: bash
-
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.0.1
       with:
@@ -50,12 +46,16 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: 1.21
+
+      - name: TestNetwork
+        run: GIPC_TIMEOUT=5 GIPC_WAIT=2500 make test_network
+        shell: bash
 
       - name: Build amd64
         run: |

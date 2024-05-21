@@ -16,10 +16,6 @@ jobs:
       with:
         go-version: 1.21
 
-    - name: TestNetworkReconnect
-      run: GIPC_TIMEOUT=10 GIPC_WAIT=5000 go test -tags network,randomize_ports -race -v -parallel 1 -failfast -run "Reconnect" .
-      shell: bash
-
     - name: TestNetwork
-      run: GIPC_TIMEOUT=5 GIPC_WAIT=2500 go test -tags network,randomize_ports -race -v -parallel 1 -failfast -run "Base|Handshake" .
+      run: GIPC_TIMEOUT=5 GIPC_WAIT=2500 make test_network
       shell: bash
