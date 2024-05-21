@@ -1,19 +1,15 @@
 name: Windows Testing
+
 on:
   workflow_dispatch:
 
-env:
-  GO_VERSION: "1.21"
 
 jobs:
 
   test:
     name: Run Tests
-    needs:
-      - go-generate
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
       matrix:
         os: [windows-2022]
     steps:
@@ -25,13 +21,11 @@ jobs:
       - name: Install go
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ env.GO_VERSION }}
+          go-version: 1.21
 
-      # avoid needing to download packages during test runs
       - name: Pre-fill Module Cache
         run: go mod download -x
 
       - name: Test repo
         shell: pwsh
-        run: |
-          GIPC_TIMEOUT=5 GIPC_WAIT=2500 make test
+        run: GIPC_TIMEOUT=5 GIPC_WAIT=2500 make test
