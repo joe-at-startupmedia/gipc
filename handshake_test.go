@@ -2,89 +2,10 @@ package gipc
 
 import (
 	"testing"
-	"time"
 )
 
 func serverConfig(name string) *ServerConfig {
 	return &ServerConfig{Name: name, Encryption: ENCRYPT_BY_DEFAULT}
-}
-
-func TestRead(t *testing.T) {
-
-	sIPC := &Server{Actor: Actor{
-		status:   NotConnected,
-		received: make(chan *Message),
-	}}
-
-	sIPC.status = Connected
-
-	serverFinished := make(chan bool, 1)
-
-	go func(s *Server) {
-
-		_, err := sIPC.Read()
-		if err != nil {
-			t.Error("err should be nill as tbe read function should read the 1st message added to received")
-		}
-		_, err2 := sIPC.Read()
-		if err2 != nil {
-			t.Error("err should be nill as tbe read function should read the 1st message added to received")
-		}
-
-		_, err3 := sIPC.Read()
-		if err3 == nil {
-			t.Error("we should get an error as the messages have been read and the channel closed")
-
-		} else {
-			serverFinished <- true
-		}
-
-	}(sIPC)
-
-	sIPC.received <- &Message{MsgType: 1, Data: []byte("message 1")}
-	sIPC.received <- &Message{MsgType: 1, Data: []byte("message 2")}
-	close(sIPC.received) // close channel
-
-	<-serverFinished
-
-	// Client - read tests
-
-	// 3 x client side tests
-	cIPC := &Client{
-		Actor:      Actor{status: NotConnected, received: make(chan *Message)},
-		timeout:    2 * time.Second,
-		retryTimer: 1 * time.Second,
-	}
-
-	cIPC.status = Connected
-
-	clientFinished := make(chan bool, 1)
-
-	go func() {
-
-		_, err4 := cIPC.Read()
-		if err4 != nil {
-			t.Error("err should be nill as tbe read function should read the 1st message added to received")
-		}
-		_, err5 := cIPC.Read()
-		if err5 != nil {
-			t.Error("err should be nill as tbe read function should read the 1st message added to received")
-		}
-
-		_, err6 := cIPC.Read()
-		if err6 == nil {
-			t.Error("we should get an error as the messages have been read and the channel closed")
-		} else {
-			clientFinished <- true
-		}
-
-	}()
-
-	cIPC.received <- &Message{MsgType: 1, Data: []byte("message 1")}
-	cIPC.received <- &Message{MsgType: 1, Data: []byte("message 1")}
-	close(cIPC.received) // close received channel
-
-	<-clientFinished
 }
 
 // client.connect is an internal method

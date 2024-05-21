@@ -1,4 +1,4 @@
-package test
+package gipc
 
 import (
 	"github.com/joe-at-startupmedia/gipc"

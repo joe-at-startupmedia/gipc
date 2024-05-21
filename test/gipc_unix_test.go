@@ -1,6 +1,6 @@
 //go:build !windows && !network
 
-package test
+package gipc
 
 import (
 	"fmt"

@@ -1,4 +1,4 @@
-package test
+package gipc
 
 import (
 	"fmt"
@@ -161,6 +161,110 @@ func TestBaseTimeoutServerDisconnected(t *testing.T) {
 	}
 }
 
+func TestBaseServerRead(t *testing.T) {
+
+	sc, err := gipc.StartServer(NewServerConfig("test_server_read"))
+	if err != nil {
+		t.Error(err)
+	}
+	//defer sc.Close()
+
+	gipc.Sleep()
+
+	cc, err2 := gipc.StartClient(NewClientConfig("test_server_read"))
+	if err2 != nil {
+		t.Error(err2)
+	}
+	defer cc.Close()
+
+	serverFinished := make(chan bool, 1)
+	closeBegins := make(chan bool, 1)
+	go func() {
+
+		msg, _ := sc.Read()
+		if msg.Status != "Connected" {
+			t.Error(msg)
+			t.Error("")
+		}
+
+		_, err1 := sc.Read()
+		if err != nil {
+			t.Error(err1)
+			t.Error("err should be nill as tbe read function should read the 1st message added to received")
+		}
+
+		_, err2 := sc.Read()
+		if err2 != nil {
+			t.Error(err2)
+			t.Error("err should be nill as tbe read function should read the 2nd message added to received")
+		}
+
+		closeBegins <- true
+
+		msg2, _ := sc.Read()
+		if msg2.Status != "Closed" {
+			t.Error(msg2)
+			t.Error("we should get a message that the channel is closed")
+		} else {
+			serverFinished <- true
+		}
+	}()
+
+	cc.Write(1, []byte("message 1"))
+	cc.Write(1, []byte("message 2"))
+	<-closeBegins
+	sc.Close()
+	<-serverFinished
+}
+
+func TestBaseClientRead(t *testing.T) {
+
+	sc, err := gipc.StartServer(NewServerConfig("test_client_read"))
+	if err != nil {
+		t.Error(err)
+	}
+	defer sc.Close()
+
+	gipc.Sleep()
+
+	cc, err2 := gipc.StartClient(NewClientConfig("test_client_read"))
+	if err2 != nil {
+		t.Error(err2)
+	}
+
+	serverFinished := make(chan bool, 1)
+	closeBegins := make(chan bool, 1)
+	go func() {
+
+		_, err := cc.Read()
+		if err != nil {
+			t.Error(err)
+			t.Error("err should be nill as tbe read function should read the 1st message added to received")
+		}
+		_, err2 := cc.Read()
+		if err2 != nil {
+			t.Error(err2)
+			t.Error("err should be nill as tbe read function should read the 2nd message added to received")
+		}
+
+		closeBegins <- true
+
+		msg, _ := cc.Read()
+		if msg.Status != "Closed" {
+			t.Error("we should get a message that the channel has been closed")
+
+		} else {
+			serverFinished <- true
+		}
+	}()
+
+	sc.Write(1, []byte("message 1"))
+	sc.Write(1, []byte("message 2"))
+	<-closeBegins
+	cc.Close()
+	<-serverFinished
+}
+
 func TestBaseWrite(t *testing.T) {
 
 	sc, err := gipc.StartServer(NewServerConfig("test_write"))
@@ -173,7 +277,7 @@ func TestBaseWrite(t *testing.T) {
 
 	cc, err2 := gipc.StartClient(NewClientConfig("test_write"))
 	if err2 != nil {
-		t.Error(err)
+		t.Error(err2)
 	}
 	defer cc.Close()
 
@@ -313,7 +417,7 @@ func TestBaseGetConnected(t *testing.T) {
 
 	cc, err2 := gipc.StartClient(NewClientConfig("test22"))
 	if err2 != nil {
-		t.Error(err)
+		t.Error(err2)
 	}
 	defer cc.Close()
 
@@ -404,7 +508,7 @@ func TestBaseClientWrongMessageType(t *testing.T) {
 
 	cc, err2 := gipc.StartClient(NewClientConfig("test3"))
 	if err2 != nil {
-		t.Error(err)
+		t.Error(err2)
 	}
 	defer cc.Close()
 
@@ -476,7 +580,7 @@ func TestBaseServerCorrectMessageType(t *testing.T) {
 
 	cc, err2 := gipc.StartClient(NewClientConfig("test358"))
 	if err2 != nil {
-		t.Error(err)
+		t.Error(err2)
 	}
 	defer cc.Close()
 
@@ -544,7 +648,7 @@ func TestBaseClientCorrectMessageType(t *testing.T) {
 
 	cc, err2 := gipc.StartClient(NewClientConfig("test355"))
 	if err2 != nil {
-		t.Error(err)
+		t.Error(err2)
 	}
 	defer cc.Close()
 
@@ -616,7 +720,7 @@ func TestBaseServerSendMessage(t *testing.T) {
 
 	cc, err2 := gipc.StartClient(NewClientConfig("test377"))
 	if err2 != nil {
-		t.Error(err)
+		t.Error(err2)
 	}
 	defer cc.Close()
 
@@ -697,7 +801,7 @@ func TestBaseClientSendMessage(t *testing.T) {
 
 	cc, err2 := gipc.StartClient(NewClientConfig("test3661"))
 	if err2 != nil {
-		t.Error(err)
+		t.Error(err2)
 	}
 	defer cc.Close()
 
@@ -778,7 +882,7 @@ func TestBaseClientClose(t *testing.T) {
 
 	cc, err2 := gipc.StartClient(NewClientConfig("test10A"))
 	if err2 != nil {
-		t.Error(err)
+		t.Error(err2)
 	}
 
 	holdIt := make(chan bool, 1)
