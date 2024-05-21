@@ -1,8 +1,7 @@
 name: Testing Windows
 
 on:
-  push:
-    branches: [ "windows" ]
+  workflow_dispatch:
 
 jobs:
 
