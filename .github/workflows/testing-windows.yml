@@ -28,4 +28,4 @@ jobs:
 
       - name: Test repo
         shell: bash
-        run: GIPC_TIMEOUT=5 GIPC_WAIT=2500 make
+        run: GIPC_TIMEOUT=5 GIPC_WAIT=2500 make run
