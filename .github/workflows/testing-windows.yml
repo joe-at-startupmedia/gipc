@@ -23,8 +23,13 @@ jobs:
         with:
           go-version: 1.21
 
+      - name: Vet
+        run: go vet ./...
+        shell: bash
+
       - name: Pre-fill Module Cache
-        run: go mod download -x
+        run: go mod tidy
+        shell: bash
 
       - name: Run Simple
         shell: bash
