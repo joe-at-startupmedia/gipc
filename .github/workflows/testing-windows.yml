@@ -1,0 +1,18 @@
+name: Testing Windows
+
+jobs:
+
+  test:
+    name: Test
+    runs-on: windows-lastest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.21
+
+    - name: TestNetwork
+      run: GIPC_TIMEOUT=5 GIPC_WAIT=2500 make test_network
+      shell: bash
