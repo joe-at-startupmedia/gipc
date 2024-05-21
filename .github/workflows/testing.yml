@@ -56,7 +56,7 @@ jobs:
       - name: TestNetworkWindows
         if: |
           matrix.os == 'windows-2022'
-        run: GIPC_TIMEOUT=10 GIPC_WAIT=2500 make test_network
+        run: GIPC_WAIT=2500 go test -race -v -parallel 1 -failfast -run "Base|Connect|Handshake|TestReconnectServerMulti" .
         shell: bash
 
       - name: TestNetworkUbuntu
