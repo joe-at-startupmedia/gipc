@@ -23,6 +23,7 @@ func GetTimeout() time.Duration {
 
 var TimeoutClientConfig = ClientConfig{
 	Timeout:    time.Second * GetTimeout(),
+	RetryTimer: time.Second * 1,
 	Encryption: ENCRYPT_BY_DEFAULT,
 }
 
