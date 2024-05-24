@@ -1,4 +1,4 @@
-//go:build !windows && !network
+//go:build !windows && !network && !shmem
 
 package gipc
 
@@ -18,7 +18,7 @@ func getSocketName(clientId int, name string) string {
 	}
 }
 
-func (c *Client) connect() (net.Conn, error) {
+func (c *Client) connect() (ActorConn, error) {
 
 	conn, err := net.Dial("unix", getSocketName(c.ClientId, c.config.ClientConfig.Name))
 	//connect: no such file or directory happens a lot when the client connection closes under normal circumstances
@@ -48,11 +48,15 @@ func (s *Server) listen(clientId int) error {
 		return err
 	}
 
-	s.listener = listener
+	s.listener = (ServerListener)(listener)
 
 	if s.config.ServerConfig.UnmaskPermissions {
 		syscall.Umask(oldUmask)
 	}
 
 	return nil
+}
+
+func (s *Server) accept() (ActorConn, error) {
+	return s.listener.Accept()
 }

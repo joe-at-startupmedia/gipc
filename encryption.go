@@ -10,7 +10,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"net"
 )
 
 func (a *Actor) shouldUseEncryption() bool {
@@ -82,7 +81,7 @@ func generateKeys() (*ecdsa.PrivateKey, *ecdsa.PublicKey, error) {
 	return priva, puba, err
 }
 
-func sendPublic(conn net.Conn, pub *ecdsa.PublicKey) error {
+func sendPublic(conn ActorConn, pub *ecdsa.PublicKey) error {
 
 	pubSend := publicKeyToBytes(pub)
 	if pubSend == nil {
@@ -97,7 +96,7 @@ func sendPublic(conn net.Conn, pub *ecdsa.PublicKey) error {
 	return nil
 }
 
-func recvPublic(conn net.Conn) (*ecdsa.PublicKey, error) {
+func recvPublic(conn ActorConn) (*ecdsa.PublicKey, error) {
 
 	buff := make([]byte, 97)
 	i, err := conn.Read(buff)

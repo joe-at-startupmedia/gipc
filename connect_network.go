@@ -48,7 +48,7 @@ func (s *Server) getHostAddr(clientId int) string {
 	return fmt.Sprintf("%s:%d", GetDefaultHost(), port+clientId)
 }
 
-func (c *Client) connect() (net.Conn, error) {
+func (c *Client) connect() (ActorConn, error) {
 
 	conn, err := net.Dial(DEFAULT_NETWORK_TYPE, c.getHostAddr(c.ClientId))
 	if err != nil {
@@ -68,4 +68,8 @@ func (s *Server) listen(clientId int) error {
 	s.listener = listener
 
 	return nil
+}
+
+func (s *Server) accept() (ActorConn, error) {
+	return s.listener.Accept()
 }

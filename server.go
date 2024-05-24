@@ -2,7 +2,6 @@ package gipc
 
 import (
 	"io"
-	"net"
 )
 
 // StartServer - starts the ipc server.
@@ -63,7 +62,7 @@ func (s *Server) acceptLoop() {
 
 	for {
 
-		conn, err := s.listener.Accept()
+		conn, err := s.accept()
 		if err != nil {
 			s.logger.Debugf("Server.acceptLoop -> listen.Accept err: %s", err)
 			return
@@ -110,10 +109,6 @@ func (s *Server) ByteReader(a *Actor, buff []byte) bool {
 	}
 
 	return true
-}
-
-func (s *Server) GetListener() net.Listener {
-	return s.listener
 }
 
 func (s *Server) close() {

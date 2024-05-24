@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net"
 	"os"
 	"sync"
 	"time"
@@ -139,12 +138,12 @@ func (a *Actor) Write(msgType int, message []byte) error {
 	if a.config.IsServer {
 		if mlen > a.config.ServerConfig.MaxMsgSize {
 			err := errors.New("message exceeds maximum message length")
-			a.logger.Errorf("%s.Write err: %s", a, err)
+			a.logger.Errorf("%s.Write err: %s %d > %d", a, err, mlen, a.config.ServerConfig.MaxMsgSize)
 			return err
 		}
 	} else if mlen > a.clientRef.maxMsgSize {
 		err := errors.New("message exceeds maximum message length")
-		a.logger.Errorf("%s.Write err: %s", a, err)
+		a.logger.Errorf("%s.Write err: %s %d > %d", a, err, mlen, a.clientRef.maxMsgSize)
 		return err
 	}
 
@@ -272,14 +271,14 @@ func (a *Actor) dispatchError(err error) {
 	go a.dispatchErrorBlocking(err)
 }
 
-func (a *Actor) getConn() net.Conn {
+func (a *Actor) getConn() ActorConn {
 	a.mutex.Lock()
 	conn := a.conn
 	a.mutex.Unlock()
 	return conn
 }
 
-func (a *Actor) setConn(conn net.Conn) {
+func (a *Actor) setConn(conn ActorConn) {
 	a.mutex.Lock()
 	a.conn = conn
 	a.mutex.Unlock()

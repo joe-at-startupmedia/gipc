@@ -2,6 +2,7 @@ package gipc
 
 import (
 	"crypto/cipher"
+	"github.com/joe-at-startupmedia/shmemipc"
 	"net"
 	"sync"
 	"time"
@@ -9,9 +10,21 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type ActorConn interface {
+	Write([]byte) (int, error)
+	Read([]byte) (int, error)
+	Close() error
+}
+
+type ServerListener interface {
+	Accept() (net.Conn, error)
+	Close() error
+	Addr() net.Addr
+}
+
 type Actor struct {
 	status    Status
-	conn      net.Conn
+	conn      ActorConn
 	received  chan (*Message)
 	toWrite   chan (*Message)
 	logger    *logrus.Logger
@@ -24,13 +37,15 @@ type Actor struct {
 // Server - holds the details of the server connection & config.
 type Server struct {
 	Actor
-	listener    net.Listener
+	listener    ServerListener
+	responder   *shmemipc.IpcResponder
 	Connections *ConnectionPool
 }
 
 // Client - holds the details of the client connection and config.
 type Client struct {
 	Actor
+	requester  *shmemipc.IpcRequester
 	timeout    time.Duration //
 	retryTimer time.Duration // number of seconds before trying to connect again
 	ClientId   int

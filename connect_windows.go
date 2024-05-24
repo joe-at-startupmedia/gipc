@@ -5,7 +5,6 @@ package gipc
 import (
 	"fmt"
 	"github.com/Microsoft/go-winio"
-	"net"
 	"strings"
 )
 
@@ -17,7 +16,7 @@ func getSocketName(clientId int, name string) string {
 	}
 }
 
-func (c *Client) connect() (net.Conn, error) {
+func (c *Client) connect() (ActorConn, error) {
 
 	conn, err := winio.DialPipe(getSocketName(c.ClientId, c.config.ClientConfig.Name), nil)
 
@@ -45,4 +44,8 @@ func (s *Server) listen(clientId int) error {
 	s.listener = listener
 
 	return nil
+}
+
+func (s *Server) accept() (ActorConn, error) {
+	return s.listener.Accept()
 }

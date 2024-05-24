@@ -22,7 +22,7 @@ func TestUnixUnmask(t *testing.T) {
 
 	Sleep()
 
-	info, err := os.Stat(sc.GetListener().Addr().String())
+	info, err := os.Stat(sc.listener.Addr().String())
 	if err != nil {
 		t.Error(err)
 	}

@@ -1,4 +1,4 @@
-//go:build !shmem
+//go:build shmem
 
 package gipc
 
@@ -44,13 +44,12 @@ func (sc *Server) one() error {
 		buff[1] = byte(0)
 	}
 
-	_, err := sc.getConn().Write(buff)
+	err := sc.responder.Write(buff)
 	if err != nil {
 		return errors.New("unable to send handshake ")
 	}
 
-	recv := make([]byte, 1)
-	_, err = sc.getConn().Read(recv)
+	recv, err := sc.responder.Read()
 	if err != nil {
 		return errors.New("failed to received handshake reply")
 	}
@@ -84,17 +83,15 @@ func (sc *Server) msgLength() error {
 	}
 
 	toSend := make([]byte, 4)
-	binary.BigEndian.PutUint32(toSend, uint32(len(buff)))
+	binary.LittleEndian.PutUint32(toSend, uint32(sc.config.ServerConfig.MaxMsgSize))
 	toSend = append(toSend, buff...)
 
-	_, err = sc.getConn().Write(toSend)
+	err = sc.responder.Write(toSend)
 	if err != nil {
 		return errors.New("unable to send max message length ")
 	}
 
-	reply := make([]byte, 1)
-
-	_, err = sc.getConn().Read(reply)
+	_, err = sc.responder.Read()
 	if err != nil {
 		return errors.New("did not received message length reply")
 	}
@@ -127,8 +124,7 @@ func (cc *Client) handshake() error {
 
 func (cc *Client) one() error {
 
-	recv := make([]byte, 2)
-	_, err := cc.getConn().Read(recv)
+	recv, err := cc.requester.Read()
 	if err != nil {
 		return errors.New("failed to received handshake message")
 	}
@@ -148,22 +144,18 @@ func (cc *Client) one() error {
 
 func (cc *Client) msgLength() error {
 
-	buff := make([]byte, 4)
-
-	_, err := cc.getConn().Read(buff)
+	buff, err := cc.requester.Read()
 	if err != nil {
 		return errors.New("failed to received max message length 1")
 	}
 
 	var msgLen uint32
-	err = binary.Read(bytes.NewReader(buff), binary.BigEndian, &msgLen) // message length
+	err = binary.Read(bytes.NewReader(buff), binary.LittleEndian, &msgLen) // message length
 	if err != nil {
 		return errors.New("failed to read binary")
 	}
 
-	buff = make([]byte, int(msgLen))
-
-	_, err = cc.getConn().Read(buff)
+	buff, err = cc.requester.Read()
 	if err != nil {
 		return errors.New("failed to received max message length 2")
 	}
@@ -176,7 +168,7 @@ func (cc *Client) msgLength() error {
 	}
 
 	var maxMsgSize uint32
-	err = binary.Read(bytes.NewReader(buff), binary.BigEndian, &maxMsgSize) // message length
+	err = binary.Read(bytes.NewReader(buff), binary.LittleEndian, &maxMsgSize) // message length
 	if err != nil {
 		return errors.New("failed to read binary")
 	}
@@ -190,6 +182,6 @@ func (cc *Client) handshakeSendReply(result byte) error {
 	buff := make([]byte, 1)
 	buff[0] = result
 
-	_, err := cc.getConn().Write(buff)
+	err := cc.requester.Write(buff)
 	return err
 }
